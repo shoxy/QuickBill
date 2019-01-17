@@ -12,10 +12,7 @@ export default class App extends Component {
         return (
             <Router>
                 <div>
-                    <NavBar />
-                    <Route exact path="/QuickBill/" component={HomePage} />
-                    <Route path="/QuickBill/dashboard" component={Dashboard} />
-                    <Route path="/QuickBill/preview" component={Preview}></Route>
+                    <Dashboard/>
                 </div>
             </Router>
         );

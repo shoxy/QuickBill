@@ -1,15 +1,15 @@
 [
     {
+        "value": "€",
+        "label": "EUR"
+    },
+    {
         "value": "$",
         "label": "USD"
     },
     {
         "value": "CA$",
         "label": "CAD"
-    },
-    {
-        "value": "€",
-        "label": "EUR"
     },
     {
         "value": "AED",

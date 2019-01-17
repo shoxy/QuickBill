@@ -16,6 +16,10 @@ type Props = {
 
 class Dashboard extends Component {
 
+    constructor(props: Props) {
+        super(props);
+    }
+
     componentDidMount() {
         const app = document.querySelector("#app");
         if (app) {
@@ -30,21 +34,69 @@ class Dashboard extends Component {
         }     
     }
 
+    submitInvoice() {
+        var parsedDate = new Date($('#date').val());
+        var DateString = parsedDate.getFullYear() + '-' + parsedDate.getMonth() + '-' + parsedDate.getDate() + 'TT00:00:00';
+        parsedDate = new Date($('#due_date').val());
+        var DueDateString = parsedDate.getFullYear() + '-' + parsedDate.getMonth() + '-' + parsedDate.getDate() + 'TT00:00:00';
+        var ExpectedPaymentDate = DueDateString;
+        var InvoiceNumber = $('input[name="invoiceNumber"]').val();
+        var CurrencyCode = $('input[name="currency"]').val() === '$' ? 'USD' : 'EUR';
+        var Status = $('input[name="status"]').val();
+        var LineAmountTypes = 'Inclusive';
+        var SubTotal = parseFloat($('#subtotal').text());
+        var TotalTax = 0;
+        var TotalVAT = 0;
+        var DiscountRate = 0;
+        var Total = parseFloat($('#total').text());
+        var LineItems = [];
+
+        $('.item-row').each(function (index, item) {
+            LineItems[index] = {
+                ItemCode: $(item).find('input[name="name"]').val(),
+                Description: $(item).find('input[name="description"]').val(),
+                Quantity: parseInt($(item).find('input[name="quantity"]').val()),
+                UnitAmount: parseFloat($(item).find('input[name="price"]').val()),
+            };
+        });
+        var json = {
+            Type: "ACCREC",
+            Contact: {
+                "ContactID": "eaa28f49-6028-4b6e-bb12-d8f6278073fc",
+                "Email": "giovanni.piccinelli@icloud.com"
+            },
+            DateString: DateString,
+            DueDateString: DueDateString,
+            ExpectedPaymentDate: ExpectedPaymentDate,
+            InvoiceNumber: InvoiceNumber,
+            CurrencyCode: CurrencyCode,
+            Status: Status,
+            LineAmountTypes: LineAmountTypes,
+            SubTotal: SubTotal,
+            TotalTax: TotalTax,
+            TotalVAT: TotalVAT,
+            DiscountRate: DiscountRate,
+            Total: Total,
+            LineItems: LineItems
+        };
+
+        parent.submitInvoice(json);
+    }
+
     render() {
         return (
-            <div className="dashboard">
+            <div className="dashboard" style={{'margin-top': 0}}>
                 <SideNav />
                 <Invoice />
                 <div className="dashboard__element">
                     <div className="solid-btn solid-btn--ghost solid-btn--dashboard">
-                        <Link to="/QuickBill/preview" className="ghost-btn"><i className="fa fa-eye" aria-hidden="true"> </i> Preview</Link>
-                        <Link
-                            to="preview" 
+                        <button onClick={() => {window.print();}} className="ghost-btn"><i className="fa fa-eye" aria-hidden="true"> </i> Print</button>
+                        <button
                             className="ghost-btn"
-                            onClick={() => {this.props.setDownloadStatus(!this.props.downloadStatus)}}
-                            >
-                            <i className="fa fa-arrow-circle-down" aria-hidden="true"> </i> Download
-                        </Link>
+                            onClick={() => {this.submitInvoice()}}
+                        >
+                            <i className="fa fa-arrow-circle-down" aria-hidden="true"> </i> Submit
+                        </button>
                     </div>
                 </div>
             </div>

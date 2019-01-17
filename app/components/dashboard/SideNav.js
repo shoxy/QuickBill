@@ -34,14 +34,20 @@ type Props = {
 };
 
 const dateOptions = [
-    { value: "MM/DD/YYYY", label: "MM/DD/YYYY" },
     { value: "DD/MM/YYYY", label: "DD/MM/YYYY" },
+    { value: "MM/DD/YYYY", label: "MM/DD/YYYY" },
     { value: "YYYY/MM/DD", label: "YYYY/MM/DD" },
 ]
 
 class SideNav extends Component {
     constructor(props: Props) {
+        props.currency = currencyData[0];
+        // props.dateFormat = dateOptions[0];
         super(props);
+    }
+
+    componentDidMount() {
+        this.props.setCurrency({"value": "€", "label": "EUR"});
     }
 
     handleChange = (e: Event) => {
@@ -59,7 +65,7 @@ class SideNav extends Component {
             this.props.setCurrency(val);
         }
         else {
-            this.props.setCurrency({"value": "$", "label": "USD"});
+            this.props.setCurrency({"value": "€", "label": "EUR"});
         }
     }
 
@@ -68,7 +74,7 @@ class SideNav extends Component {
             this.props.setDateFormat(val);
         }
         else {
-            this.props.setDateFormat({value: "MM/DD/YYYY", label: "MM/DD/YYYY"});
+            this.props.setDateFormat({value: "DD/MM/YYYY", label: "DD/MM/YYYY"});
         }
     }
 
@@ -89,44 +95,7 @@ class SideNav extends Component {
 
         return (
             <div className="side-nav">
-                <h4>Invoice Settings</h4>
-                <hr />
                 <div className="side-nav__element">
-                    <div className="setting">
-                        <span>Discount</span>
-                        <input 
-                            type="text"
-                            name="discount"
-                            value={this.props.addInfo.discount}
-                            onChange={this.handleChange} />
-                    </div>
-                    <div className="setting">
-                        <span>Tax</span>
-                        <input 
-                            type="text"
-                            name="tax"
-                            value={this.props.addInfo.tax}
-                            onChange={this.handleChange} />
-                    </div>
-
-                    <div className="setting">
-                        <span>Value added tax (VAT)</span>
-                        <input
-                            type="text"
-                            name="vat"
-                            value={this.props.addInfo.vat}
-                            onChange={this.handleChange} />
-                    </div>
-
-                    <div className="setting setting--inline">
-                        <span>Paid to date</span>
-                        <label>
-                            <Toggle
-                                checked={this.props.paidStatus}
-                                icons={false}
-                                onChange={() => {this.props.setPaidStatus(!this.props.paidStatus)}} />
-                        </label>
-                    </div>
 
                     {paidAmountInput}
 

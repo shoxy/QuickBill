@@ -43,9 +43,6 @@ export default class NavBar extends Component {
         return(
             <nav className="navbar">
                 <ul>
-                    <li className="navbar__logo">
-                        <Link to="/QuickBill/" style={this.state.pageOffset >= 450 ? style.logo : {}}>QuickBill</Link>
-                    </li>
                     <li>
                         <a 
                         href="https://github.com/PunitGr/QuickBill"

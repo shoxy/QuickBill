@@ -12,6 +12,7 @@ import {
     setIssueDate,
     setDueDate
 } from "../../actions";
+import Toggle from "react-toggle";
 
 type Props = {
     currency: Object,
@@ -48,6 +49,7 @@ type Props = {
 type State = {
     issueFocused: boolean,
     dueFocused: boolean,
+    channelId: string,
 };
 
 const options = [
@@ -62,12 +64,33 @@ class Invoice extends Component {
 
     constructor(props: Props) {
         super(props);
+        props.dueDate = props.issueDate;
+        var channelId = parent.window.channelId;
         this.state = {
             invoiceNumber: "001",
             job: "",
             issueFocused: false,
-            dueFocused: false
-        }
+            dueFocused: false,
+            channelId: channelId
+        };
+    }
+
+    componentDidMount() {
+        var pathArray = document.referrer.split( '/' );
+        var protocol = pathArray[0];
+        var host = pathArray[2];
+        var url = protocol + '//' + host + '/get-inv-id';
+        fetch(url, {
+            method: 'POST',
+            headers: {
+                'Accept': 'application/json',
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+                channelId: this.state.channelId,
+            })
+        }).then(response => response.json())
+            .then(data => this.props.setInvoiceDetails('invoiceNumber', JSON.parse(data).inv_no));
     }
 
     handleChange = (e: Event) => {
@@ -94,6 +117,7 @@ class Invoice extends Component {
         let discount = 0;
         let vat = 0;
         let amountPaidElement;
+        let channelId = this.state.channelId;
 
         if (addInfo["discount"] && addInfo["discount"] > 0) {
             discountElement = (
@@ -156,15 +180,9 @@ class Invoice extends Component {
                             value={this.props.status}
                             options={options}
                             searchable={false}
+                            disabled={true}
                             onChange={this.selectChange}
                         />
-                        <input
-                            className="invoice-type"
-                            name="invoiceType"
-                            value={invoiceDetails.invoiceType}
-                            onChange={this.handleChange}
-                            maxLength="10"
-                            />
                     </div>
 
                     <div className="invoice__info">
@@ -177,6 +195,7 @@ class Invoice extends Component {
                                 onDateChange={date => this.props.setIssueDate(date)}
                                 onFocusChange={({focused}) => this.setState({ issueFocused: !this.state.issueFocused})}
                                 isOutsideRange={() => false}
+                                id={'date'}
                                 />
                         </div>
 
@@ -189,6 +208,7 @@ class Invoice extends Component {
                                 onDateChange={date => this.props.setDueDate(date)}
                                 onFocusChange={({focused}) => this.setState({ dueFocused: !this.state.dueFocused})}
                                 isOutsideRange={() => false}
+                                id={'due_date'}
                                 />
                         </div>
 
@@ -202,53 +222,9 @@ class Invoice extends Component {
                                 placeholder="Invoice Number"
                                 />
                         </div>
-
-                        <div className="info">
-                            <label htmlFor="job">Job</label>
-                            <input
-                                className="input-element input-element--job"
-                                name="job"
-                                value={invoiceDetails.job}
-                                onChange={this.handleChange}
-                                placeholder="Description"
-                                />
-                        </div>
                     </div>
 
                     <div className="invoice__info">
-                        <div className="address-element">
-                            <label htmlFor="from">Bill from:</label>
-                            <input 
-                                type="text"
-                                className="input-element" 
-                                name="from"
-                                value={invoiceDetails.from}
-                                onChange={this.handleChange}
-                                placeholder="From"
-                                />
-                            <textarea 
-                                name="addressFrom"
-                                value={invoiceDetails.addressFrom}
-                                onChange={this.handleChange}
-                                placeholder="Address"
-                            />
-                            <input 
-                                type="text"
-                                className="input-element" 
-                                name="phoneFrom"
-                                value={invoiceDetails.phoneFrom}
-                                onChange={this.handleChange}
-                                placeholder="Phone"
-                                />
-                            <input 
-                                type="email"
-                                className="input-element" 
-                                name="emailFrom"
-                                value={invoiceDetails.emailFrom}
-                                onChange={this.handleChange}
-                                placeholder="Email"
-                                />
-                        </div>
                         <div className="address-element">
                             <label htmlFor="to">Bill to:</label>
                             <input 
@@ -286,11 +262,51 @@ class Invoice extends Component {
                     <hr />
                     <Item />
                     <hr />
+                    <div className="side-nav">
+                        <div className="side-nav__element">
+                            <div className="setting">
+                                <span>Discount</span>
+                                <input
+                                    type="text"
+                                    name="discount"
+                                    value={this.props.addInfo.discount}
+                                    onChange={this.handleChange} />
+                            </div>
+                            <div className="setting">
+                                <span>Tax</span>
+                                <input
+                                    type="text"
+                                    name="tax"
+                                    value={this.props.addInfo.tax}
+                                    onChange={this.handleChange} />
+                            </div>
+
+                            <div className="setting">
+                                <span>Value added tax (VAT)</span>
+                                <input
+                                    type="text"
+                                    name="vat"
+                                    value={this.props.addInfo.vat}
+                                    onChange={this.handleChange} />
+                            </div>
+
+                            <div className="setting setting--inline">
+                                <span>Paid to date</span>
+                                <label>
+                                    <Toggle
+                                        checked={this.props.paidStatus}
+                                        icons={false}
+                                        onChange={() => {this.props.setPaidStatus(!this.props.paidStatus)}} />
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+                    <br />
                     <div className="invoice__bill">
                         <div className="bill-detail">                        
                             <div>
                                 <span>Subtotal</span>
-                                <h2>{this.props.currency["value"]} {subTotal.toFixed(2)}</h2>
+                                <h2>{this.props.currency["value"]} <span id={'subtotal'}>{subTotal.toFixed(2)}</span></h2>
                             </div>
                             {discountElement}
                             <div>
@@ -301,7 +317,7 @@ class Invoice extends Component {
                             {amountPaidElement}
                             <div>
                                 <span>Total ({this.props.currency["label"]})</span>
-                                <h2 className="bill-total">{this.props.currency["value"]} {amount.toFixed(2)}</h2>
+                                <h2 className="bill-total">{this.props.currency["value"]} <span id={'total'}>{amount.toFixed(2)}</span></h2>
                             </div>
                         </div>
                     </div>
