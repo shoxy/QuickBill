@@ -2,7 +2,6 @@
 import React, { Component } from "react";
 import SideNav from "./SideNav";
 import Invoice from "./Invoice";
-import { Link } from "react-router-dom";
 import { connect } from "react-redux";
 
 import {
@@ -36,9 +35,9 @@ class Dashboard extends Component {
 
     submitInvoice() {
         var parsedDate = new Date($('#date').val());
-        var DateString = parsedDate.getFullYear() + '-' + parsedDate.getMonth() + '-' + parsedDate.getDate() + 'TT00:00:00';
+        var DateString = parsedDate.getFullYear() + '-' + (parsedDate.getMonth() + 1) + '-' + parsedDate.getDate() + 'TT00:00:00';
         parsedDate = new Date($('#due_date').val());
-        var DueDateString = parsedDate.getFullYear() + '-' + parsedDate.getMonth() + '-' + parsedDate.getDate() + 'TT00:00:00';
+        var DueDateString = parsedDate.getFullYear() + '-' + (parsedDate.getMonth() + 1) + '-' + parsedDate.getDate() + 'TT00:00:00';
         var ExpectedPaymentDate = DueDateString;
         var InvoiceNumber = $('input[name="invoiceNumber"]').val();
         var CurrencyCode = $('input[name="currency"]').val() === '$' ? 'USD' : 'EUR';
@@ -50,6 +49,8 @@ class Dashboard extends Component {
         var DiscountRate = 0;
         var Total = parseFloat($('#total').text());
         var LineItems = [];
+        var ContactID = $('input[name="to"]').val();
+        var Email = $('input[name="emailTo"]').val();
 
         $('.item-row').each(function (index, item) {
             LineItems[index] = {
@@ -62,8 +63,8 @@ class Dashboard extends Component {
         var json = {
             Type: "ACCREC",
             Contact: {
-                "ContactID": "eaa28f49-6028-4b6e-bb12-d8f6278073fc",
-                "Email": "giovanni.piccinelli@icloud.com"
+                ContactID: ContactID,
+                Email: Email
             },
             DateString: DateString,
             DueDateString: DueDateString,

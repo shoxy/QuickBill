@@ -106,7 +106,7 @@ class Invoice extends Component {
         }else {
             this.props.setStatus({ value: "paid", label: "Paid"});
         }
-    }
+    };
 
     render() {
         const { items, addInfo, invoiceDetails, paidStatus } = this.props;
@@ -117,7 +117,6 @@ class Invoice extends Component {
         let discount = 0;
         let vat = 0;
         let amountPaidElement;
-        let channelId = this.state.channelId;
 
         if (addInfo["discount"] && addInfo["discount"] > 0) {
             discountElement = (
