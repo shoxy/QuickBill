@@ -97,20 +97,19 @@ class Item extends Component {
 
     render() {
         let { order, items } = this.props;
-
         return (
             <div className="item">
                 <div className="item__head">
                     <div>Item</div>
-                    <div>Description</div>
-                    <div>Quantity</div>
-                    <div>Price</div>
-                    <div>SubAmount</div>
+                    <div>{window.translations ? window.translations['Descritpion'] : ''}</div>
+                    <div>{window.translations ? window.translations['Quantity'] : ''}</div>
+                    <div>{window.translations ? window.translations['Price'] : ''}</div>
+                    <div>{window.translations ? window.translations['Subtotal'] : ''}</div>
                 </div>
                 <SortableList order={order} items={items} onSortEnd={this.onSortEnd} useDragHandle={true} onRemove={this.props.removeItem} />
                 <a onClick={this.addInput} className="solid-btn solid-btn--new">
                     <i className="fa fa-plus-circle" aria-hidden="true"></i>
-                    Add Row
+                    {window.translations ? window.translations['Add Row'] : ''}
                 </a>
             </div>
         );

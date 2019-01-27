@@ -158,7 +158,7 @@ class Preview extends Component {
         if (addInfo["amountPaid"] && addInfo["amountPaid"] > 0 && paidStatus) {
             amountPaidElement = (
                         <div>
-                            <span>Paid to Date</span>
+                            <span>{window.translations['Paid to date']}</span>
                             <h2>{this.props.currency["value"]} {addInfo["amountPaid"]}</h2>
                         </div>
                     );

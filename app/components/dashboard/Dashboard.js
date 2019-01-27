@@ -91,12 +91,12 @@ class Dashboard extends Component {
                 <Invoice />
                 <div className="dashboard__element">
                     <div className="solid-btn solid-btn--ghost solid-btn--dashboard">
-                        <button onClick={() => {window.print();}} className="ghost-btn"><i className="fa fa-eye" aria-hidden="true"> </i> Print</button>
+                        <button onClick={() => {window.print();}} className="ghost-btn"><i className="fa fa-eye" aria-hidden="true"> </i> {window.translations['Print']}</button>
                         <button
                             className="ghost-btn"
                             onClick={() => {this.submitInvoice()}}
                         >
-                            <i className="fa fa-arrow-circle-down" aria-hidden="true"> </i> Submit
+                            <i className="fa fa-arrow-circle-down" aria-hidden="true"> </i> {window.translations['Submit']}
                         </button>
                     </div>
                 </div>

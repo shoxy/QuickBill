@@ -42,8 +42,11 @@ const dateOptions = [
 class SideNav extends Component {
     constructor(props: Props) {
         props.currency = currencyData[0];
-        // props.dateFormat = dateOptions[0];
         super(props);
+        var channelId = parent.window.channelId;
+        this.state = {
+            channelId: channelId
+        };
     }
 
     componentDidMount() {
@@ -104,7 +107,7 @@ class SideNav extends Component {
                 <div className="side-nav__inline-element">
                     <div className="side-nav__element side-nav__element--select">
                         <div className="setting">
-                            <span>Currency</span>
+                            <span>{window.translations['Currency']}</span>
                             <Select 
                                 name="currency"
                                 value={this.props.currency}
@@ -115,7 +118,7 @@ class SideNav extends Component {
                     </div>
                     <div className="side-nav__element side-nav__element--select">
                         <div className="setting">
-                            <span>Date Format</span>
+                            <span>{window.translations ? window.translations['Date Format'] : ''}</span>
                             <Select 
                                 name="dateFormat"
                                 searchable={false}

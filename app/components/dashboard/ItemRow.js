@@ -80,7 +80,7 @@ class ItemRow extends Component {
                     type="text"
                     value={data.name}
                     onChange={this.handleChange}
-                    placeholder="Item Name"
+                    placeholder={window.translations ? window.translations['Item Name'] : ''}
                 />
                 <input
                     style={this.props.width >= 700 ? style.inputStyle : responsiveStyle.inputStyle}
@@ -88,7 +88,7 @@ class ItemRow extends Component {
                     type="text"
                     value={data.description}
                     onChange={this.handleChange}
-                    placeholder="Description"
+                    placeholder={window.translations ? window.translations['Descritpion'] : ''}
                 />
                 <input
                     style={this.props.width >= 700 ? style.inputStyle : responsiveStyle.inputStyle}
@@ -96,7 +96,7 @@ class ItemRow extends Component {
                     type="text"
                     value={data.quantity}
                     onChange={this.handleChange}
-                    placeholder="Quantity"
+                    placeholder={window.translations ? window.translations['Quantity'] : ''}
                 />
                 <input
                     style={this.props.width >= 700 ? style.inputStyle : responsiveStyle.inputStyle}
@@ -104,7 +104,7 @@ class ItemRow extends Component {
                     type="text"
                     value={data.price}
                     onChange={this.handleChange}
-                    placeholder="Price"
+                    placeholder={window.translations ? window.translations['Price'] : ''}
                 />
                 {price}
             </div>

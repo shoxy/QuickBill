@@ -4,7 +4,6 @@ import { SingleDatePicker } from "react-dates";
 import Select from "react-select";
 import { connect } from "react-redux";
 
-import SideNav from "./SideNav";
 import Item from "./item";
 import {
     setInvoiceDetails,
@@ -50,14 +49,15 @@ type State = {
     issueFocused: boolean,
     dueFocused: boolean,
     channelId: string,
+    translations: any,
 };
 
-const options = [
-    { value: "paid", label: "Paid" },
+let options = [
+    { value: "paid", label: 'Paid' },
     { value: "due", label: "Due" },
     { value: "overdue", label: "Overdue" },
     { value: "onhold", label: "On Hold" },
-]
+];
 
 class Invoice extends Component {
     state: State;
@@ -66,6 +66,8 @@ class Invoice extends Component {
         super(props);
         props.dueDate = props.issueDate;
         var channelId = parent.window.channelId;
+        // options[0].label = window.translations['Paid'];
+        this.props.setStatus({ value: "paid", label: window.translations['Paid']});
         this.state = {
             invoiceNumber: "001",
             job: "",
@@ -79,7 +81,8 @@ class Invoice extends Component {
         var pathArray = document.referrer.split( '/' );
         var protocol = pathArray[0];
         var host = pathArray[2];
-        var url = protocol + '//' + host + '/get-inv-id';
+        var baseUrl = protocol + '//' + host;
+        var url = baseUrl + '/get-inv-id';
         fetch(url, {
             method: 'POST',
             headers: {
@@ -91,6 +94,7 @@ class Invoice extends Component {
             })
         }).then(response => response.json())
             .then(data => this.props.setInvoiceDetails('invoiceNumber', JSON.parse(data).inv_no));
+
     }
 
     handleChange = (e: Event) => {
@@ -98,13 +102,13 @@ class Invoice extends Component {
             const { name, value } = e.target;
             this.props.setInvoiceDetails(name, value);
         }
-    }
+    };
 
     selectChange = (val: {value: ?string, label: ?string}) => {
         if (val) {
             this.props.setStatus(val);
         }else {
-            this.props.setStatus({ value: "paid", label: "Paid"});
+            this.props.setStatus({ value: "paid", label: window.translations['Paid']});
         }
     };
 
@@ -139,7 +143,7 @@ class Invoice extends Component {
         if (addInfo["amountPaid"] && addInfo["amountPaid"] > 0 && paidStatus) {
             amountPaidElement = (
                         <div>
-                            <span>Paid to Date</span>
+                            <span>{window.translations ? window.translations['Paid to date'] : ''}</span>
                             <h2>{this.props.currency["value"]} {addInfo["amountPaid"]}</h2>
                         </div>
                     );
@@ -169,7 +173,6 @@ class Invoice extends Component {
             }
         }
 
-
         return (
             <div className="wrapper">
                 <div className="invoice">
@@ -186,7 +189,7 @@ class Invoice extends Component {
 
                     <div className="invoice__info">
                         <div className="info">
-                            <label htmlFor="date">Date</label>
+                            <label htmlFor="date">{window.translations ? window.translations['Date'] : ''}</label>
                             <SingleDatePicker
                                 date={this.props.issueDate}
                                 focused={this.state.issueFocused}
@@ -199,7 +202,7 @@ class Invoice extends Component {
                         </div>
 
                         <div className="info">
-                            <label htmlFor="date">Due Date</label>
+                            <label htmlFor="date">{window.translations ? window.translations['Due Date'] : ''}</label>
                             <SingleDatePicker
                                 date={this.props.dueDate}
                                 focused={this.state.dueFocused}
@@ -212,33 +215,33 @@ class Invoice extends Component {
                         </div>
 
                         <div className="info">
-                            <label htmlFor="invoice">Invoice #</label>
+                            <label htmlFor="invoice">{window.translations ? window.translations['Invoice #'] : ''}</label>
                             <input
                                 className="input-element input-element--number"
                                 name="invoiceNumber"
                                 value={invoiceDetails.invoiceNumber}
                                 onChange={this.handleChange}
-                                placeholder="Invoice Number"
+                                placeholder={window.translations ? window.translations['Invoice #'] : ''}
                                 />
                         </div>
                     </div>
 
                     <div className="invoice__info">
                         <div className="address-element">
-                            <label htmlFor="to">Bill to:</label>
-                            <input 
+                            <label htmlFor="to">{window.translations ? window.translations['Bill To'] : ''}</label>
+                            <input
                                 type="text"
                                 className="input-element" 
                                 name="to"
                                 value={invoiceDetails.to}
                                 onChange={this.handleChange}
-                                placeholder="To"
+                                placeholder={window.translations ? window.translations['To'] : ''}
                                 />
                             <textarea 
                                 name="addressTo"
                                 value={invoiceDetails.addressTo}
                                 onChange={this.handleChange}
-                                placeholder="Address"
+                                placeholder={window.translations ? window.translations['Address'] : ''}
                             />
                             <input 
                                 type="text"
@@ -246,7 +249,7 @@ class Invoice extends Component {
                                 name="phoneTo"
                                 value={invoiceDetails.phoneTo}
                                 onChange={this.handleChange}
-                                placeholder="Phone"
+                                placeholder={window.translations ? window.translations['Phone'] : ''}
                                 />
                             <input 
                                 type="email"
@@ -254,17 +257,18 @@ class Invoice extends Component {
                                 name="emailTo"
                                 value={invoiceDetails.emailTo}
                                 onChange={this.handleChange}
-                                placeholder="Email"
+                                placeholder={window.translations ? window.translations['Email'] : ''}
                                 />
                         </div>
                     </div>
                     <hr />
                     <Item />
+
                     <hr />
                     <div className="side-nav">
                         <div className="side-nav__element">
                             <div className="setting">
-                                <span>Discount</span>
+                                <span>{window.translations ? window.translations['Discount'] : ''}</span>
                                 <input
                                     type="text"
                                     name="discount"
@@ -272,7 +276,7 @@ class Invoice extends Component {
                                     onChange={this.handleChange} />
                             </div>
                             <div className="setting">
-                                <span>Tax</span>
+                                <span>{window.translations ? window.translations['Tax'] : ''}</span>
                                 <input
                                     type="text"
                                     name="tax"
@@ -281,7 +285,7 @@ class Invoice extends Component {
                             </div>
 
                             <div className="setting">
-                                <span>Value added tax (VAT)</span>
+                                <span>{window.translations ? window.translations['Value added tax (VAT)'] : ''}</span>
                                 <input
                                     type="text"
                                     name="vat"
@@ -290,7 +294,7 @@ class Invoice extends Component {
                             </div>
 
                             <div className="setting setting--inline">
-                                <span>Paid to date</span>
+                                <span>{window.translations ? window.translations['Paid to date'] : ''}</span>
                                 <label>
                                     <Toggle
                                         checked={this.props.paidStatus}
@@ -304,18 +308,18 @@ class Invoice extends Component {
                     <div className="invoice__bill">
                         <div className="bill-detail">                        
                             <div>
-                                <span>Subtotal</span>
+                                <span>{window.translations ? window.translations['Subtotal'] : ''}</span>
                                 <h2>{this.props.currency["value"]} <span id={'subtotal'}>{subTotal.toFixed(2)}</span></h2>
                             </div>
                             {discountElement}
                             <div>
-                                <span>Taxes</span>
+                                <span>{window.translations ? window.translations['Taxes'] : ''}</span>
                                 <h2>{(this.props.addInfo["tax"] >= 0 ? this.props.addInfo["tax"] : 0) || 0} %</h2>
                             </div>
                             {vatElement}
                             {amountPaidElement}
                             <div>
-                                <span>Total ({this.props.currency["label"]})</span>
+                                <span>{window.translations ? window.translations['Total'] : ''} ({this.props.currency["label"]})</span>
                                 <h2 className="bill-total">{this.props.currency["value"]} <span id={'total'}>{amount.toFixed(2)}</span></h2>
                             </div>
                         </div>
