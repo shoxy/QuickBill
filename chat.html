@@ -2299,7 +2299,9 @@
                 }
             }
         };
-
+        ChannelHandler.onUserJoined = function(groupChannel, user) {
+            window.location.reload(true);
+        };
         sb.addChannelHandler(uuidv4(), ChannelHandler);
         var channelListQuery = sb.GroupChannel.createMyGroupChannelListQuery();
         channelListQuery.includeEmpty = true;
