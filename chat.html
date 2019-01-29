@@ -132,6 +132,7 @@
             border-radius: 50%;
             width: 80%;
             margin: 10px auto;
+            cursor: pointer;
         }
 
         #user-id, #user-nickname {
@@ -298,7 +299,7 @@
 
         /* RESPONDER */
         .responder-message-container {
-            display: grid;
+            display: block;
             align-self: flex-start;
             grid-template: auto / 40px calc(100% - 45px);
             gap: 0px 5px;
@@ -331,7 +332,7 @@
         }
 
         .responder-message-container img.user-avatar {
-            /*position: sticky;*/
+            float: left;
             top: 4px;
             width: 40px;
             height: 40px;
@@ -889,8 +890,7 @@
         }
 
         .user-message .message-text-container {
-            grid-row: 2;
-            grid-column: 1;
+            margin-right: 40px;
         }
 
         .user-message .user-avatar {
@@ -909,6 +909,7 @@
 
         .user-message img.user-avatar {
             border-radius: 50%;
+            float: right;
         }
 
         .drag-and-drop {
@@ -1203,6 +1204,7 @@
             display: inline;
             width: 10%;
             border-radius: .25rem;
+            cursor: pointer;
         }
 
         /* The sticky class is added to the navbar with JS when it reaches its scroll position */
@@ -1482,6 +1484,7 @@
 
 <div id="message-templates">
     <div class="responder-message-container user-message js-chat-message">
+        <img src="" alt="" class="user-avatar">
         <div class="sender js-sent-at">Hehe, 12:12</div>
         <div class="message-text-container">
             <div class="message-text">
@@ -1492,7 +1495,6 @@
                 </div>
             </div>
         </div>
-        <img src="" alt="" class="user-avatar">
     </div>
     <div class="messages-loader" style="display: none">
         <img src="/static/img/loader.gif" alt="">
@@ -1606,7 +1608,9 @@
             data-src="{{profile_pic}}"
             id="avatar"
             alt="BotVest"
-            style="height: 100px; width: 100px; display: flex">
+            style="height: 100px; width: 100px; display: flex"/>
+        <input type="file" class="hidden" id="avatar-file-input">
+
         <div class="user-data__container">
             <h1 id="user-id">{{userId}}</h1>
             <h1 id="user-nickname"></h1>
@@ -1910,7 +1914,8 @@
 
             var thumbSrc = portfolioData[i].thumb;
             var selectorBtnContainer = $("<div class='portfolio-selector__container'>" +
-                "<img class='portfolio-selector__thumb' src='" + thumbSrc + "' alt='thumb'>" +
+                "<img class='portfolio-selector__thumb js-portfolio-image' src='" + thumbSrc + "' alt='thumb'>" +
+                "<input type='file' class='js-portfolio-image-input hidden'>"+
                 "<img class='portfolio-selector__thumb js-sync-button' src='/static/img/sync.png'>" +
                 "<button class='portfolio-selector btn btn-default'></button><i class='fas fa-check checked-portfolio'></i>" +
                 "<div class='channel-info'><div class='channel-info__author'>Author</div>: " +
@@ -1920,6 +1925,8 @@
             var $selectorBtn = selectorBtnContainer.find('.portfolio-selector');
             var portfolioName = portfolioData[i].name;
             var syncButton = selectorBtnContainer.find('.js-sync-button');
+            $('.js-portfolio-image').attr('data-channelId', portfolioChannelId);
+            $('.js-portfolio-image-input').attr('data-channelId', portfolioChannelId);
             selectorBtnContainer.find('.channel-info__author').first().text(portfolioData[i].channelData.last_msg_user);
             var lastMsgText = portfolioData[i].channelData.last_msg;
             if (lastMsgText.charAt(0) === '{') {
@@ -3446,6 +3453,74 @@
             return '<a target="_blank" href="' + url + '">' + url + '</a>';
         })
     }
+
+    $avatar.on('click', function () {
+        $('#avatar-file-input').click();
+    });
+
+    $(document).on('change', 'avatar-file-input', function (event) {
+        event.preventDefault();
+        var userFile = $(this).prop('files')[0];
+        var formData = getFormData();
+        formData.append('file', userFile);
+
+        $.ajax({
+            url: '/upload-chat',
+            type: 'POST',
+            data: formData,
+            processData: false,
+            contentType: false,
+            success: function (data) {
+            },
+            error: function (error) {
+                console.error(error);
+            },
+        });
+    });
+
+    $(document).on('click', '.js-portfolio-image', function () {
+        $($(this).siblings()[0]).click();
+    });
+
+    $(document).on('change', '.avatar-file-input', function (event) {
+        event.preventDefault();
+        var userFile = $(this).prop('files')[0];
+        var formData = getFormData();
+        formData.append('file', userFile);
+
+        $.ajax({
+            url: '/upload-chat',
+            type: 'POST',
+            data: formData,
+            processData: false,
+            contentType: false,
+            success: function (data) {
+            },
+            error: function (error) {
+                console.error(error);
+            },
+        });
+    });
+
+    $(document).on('change', '.js-portfolio-image-input', function (event) {
+        event.preventDefault();
+        var userFile = $(this).prop('files')[0];
+        var formData = getFormData();
+        formData.append('file', userFile);
+
+        $.ajax({
+            url: '/upload-chat',
+            type: 'POST',
+            data: formData,
+            processData: false,
+            contentType: false,
+            success: function (data) {
+            },
+            error: function (error) {
+                console.error(error);
+            },
+        });
+    });
 </script>
 
 </body>
