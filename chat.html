@@ -2972,7 +2972,7 @@
         if (!messageObject.sender) {
             return '';
         }
-        return messageObject.sender.profileUrl.replace('http://omne', 'https://www.omne');
+        return messageObject.sender.profileUrl.replace('http://omne', 'https://www.omne').replace('http://botvest', 'https://www.botvest');
     }
 
     function getNickname(messageObject) {
@@ -3299,7 +3299,7 @@
         modalBody.empty();
         for (var i in channelUsers[channelId]) {
             var userDiv = $('<div></div>').addClass('channel-user');
-            var avatar = $('<img/>').addClass('channel-user__avatar').attr('src', channelUsers[channelId][i].profile_url.replace('http://omne', 'https://www.omne'));
+            var avatar = $('<img/>').addClass('channel-user__avatar').attr('src', channelUsers[channelId][i].profile_url.replace('http://omne', 'https://www.omne').replace('http://botvest', 'https://www.botvest'));
             var name = $('<span></span>').addClass('channel-user__name').text(channelUsers[channelId][i].nickname);
             var status = $('<span></span>').addClass('channel-user__status');
             var nameContainer = $('<div class="user-name__container"></div>');
