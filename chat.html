@@ -1618,7 +1618,7 @@
         </div>
     </div>
     <div id="control-buttons">
-        <button class="btn btn-success hidden" type='save' name='save' id="control-button-save">Save</button>
+        <button class="btn btn-default" id="load-more-button">Load more</button>
     </div>
 
     <div class="footer-buttons">
@@ -1901,6 +1901,20 @@
     var hiddenContainers = [];
 
     if (!isConciergePage) {
+        renderPortfolios(portfolioData);
+    } else {
+        renderConciergeMessagesContainer();
+    }
+
+    function renderConciergeMessagesContainer() {
+        var $messagesContainer = $('<div></div>');
+        $messagesContainer.attr('class', 'messages');
+        $messagesContainer.attr('id', channelId);
+        $messagesContainer.prependTo(jsChatColumn);
+        $messagesContainer.on('scroll', scrollHandler);
+    }
+
+    function renderPortfolios(portfolioData) {
         for (var i in portfolioData) {
             var portfolioChannelId = portfolioData[i].channelId;
             var $messagesContainer = $('<div></div>');
@@ -1953,28 +1967,18 @@
                 selectorBtnContainer.find('.checked-portfolio').first().css('display', 'inline-block');
             }
 
-            selectorBtnContainer.insertBefore('#control-button-save');
+            selectorBtnContainer.insertBefore('#load-more-button');
         }
-    } else {
-        renderConciergeMessagesContainer();
-    }
-
-    function renderConciergeMessagesContainer() {
-        var $messagesContainer = $('<div></div>');
-        $messagesContainer.attr('class', 'messages');
-        $messagesContainer.attr('id', channelId);
-        $messagesContainer.prependTo(jsChatColumn);
-        $messagesContainer.on('scroll', scrollHandler);
     }
 
     var displayedDocs = [];
     var graphIdPortfolioNameMapping = [];
 
-    function initGraphs() {
+    var graphsCounter = 0;
+    function initGraphs(portfolioData) {
         var graphsContainer = $('#graphs-container').first();
         var width = graphsContainer.width();
         var height = (graphsContainer.height() / 2) - 30;
-        var graphsCounter = 0;
         for (var i in portfolioData) {
             var graphsData = JSON.parse(portfolioData[i].graphs);
             for (var j in graphsData) {
@@ -2027,11 +2031,7 @@
     function initDocs() {
         $('.doc-content').each(function (index, item) {
             var filesInfo = JSON.parse($(item).text().replace(/'/g, '"'));
-            var filesChannelId = Object.keys(filesInfo)[0];
-            var files = filesInfo[filesChannelId];
-            for (var i in files) {
-                renderDoc(filesChannelId, files[i].name, files[i].posted_by, files[i].created_date, files[i].url, files[i].thumb, false);
-            }
+            renderChannelFiles(filesInfo);
             $(item).remove();
         });
         var empty = $('#file-container--empty');
@@ -2039,6 +2039,14 @@
             empty.removeClass('hidden');
         } else {
             empty.addClass('hidden');
+        }
+    }
+
+    function renderChannelFiles(filesInfo) {
+        var filesChannelId = Object.keys(filesInfo)[0];
+        var files = filesInfo[filesChannelId];
+        for (var i in files) {
+            renderDoc(filesChannelId, files[i].name, files[i].posted_by, files[i].created_date, files[i].url, files[i].thumb, false);
         }
     }
 
@@ -2075,7 +2083,7 @@
     });
 
     if (!isConciergePage) {
-        initGraphs();
+        initGraphs(portfolioData);
     }
     initDocs();
     initSendBird();
@@ -3237,7 +3245,7 @@
             description: $(this).attr('data-description'),
             zipCode: true,
             currency: 'eur',
-            amount: $(this).attr('data-amount') * 100
+            amount: $(this).attr('data-amount')
         });
     });
 
@@ -3503,6 +3511,26 @@
             error: function (error) {
                 console.error(error);
             },
+        });
+    });
+
+    $('#load-more-button').click(function (event) {
+        event.preventDefault();
+        var button = $(this);
+        if (button.hasClass('disabled')) {
+            return;
+        }
+        button.addClass('disabled');
+        button.html('<i class="fa fa-spinner fa-spin"></i>');
+        $.get('/get-additional-channels/' + userId, '', function (response) {
+            renderPortfolios(response.portList);
+            initSendBird();
+            initGraphs(response.portList);
+            for (var i in response.documents) {
+                renderChannelFiles(response.documents[i]);
+            }
+            button.removeClass('disabled');
+            button.html('Load more');
         });
     });
 </script>
