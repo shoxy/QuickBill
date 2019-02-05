@@ -2388,7 +2388,7 @@
         }
         $('.messages-loader').hide();
         channelsProcessed++;
-        if (sendBirdWasInitialized) {
+        if (sendBirdWasInitialized && $lastMessage) {
             $messagesContainer.animate({
                 scrollTop: $lastMessage.offset().top
             }, 0);
@@ -2677,9 +2677,10 @@
 
     function scrollChatToBottom() {
         var x = $('#' + channelId).first();
-        var lastElement = x.find('.js-chat-message').last();
+        var lastElement = x.find('.js-chat-message').last().get(0);
+        var offset = lastElement ? lastElement.offsetTop : 100;
         x.animate({
-            scrollTop: lastElement.get(0).offsetTop
+            scrollTop: offset
         }, 250);
     }
 
