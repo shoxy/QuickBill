@@ -1404,6 +1404,10 @@
             right: 3em;
         }
 
+        .image-message {
+            height: 300px;
+        }
+
     </style>
 </head>
 
@@ -2573,6 +2577,7 @@
         image.appendTo($messageTextField);
         image.addClass('text-image');
         image.addClass('lozad');
+        $messageTextField.addClass('image-message');
         // console.log(filepa);
         addMessageToChatColumn($messageContainer, messageObject.channelUrl);
         if (sendBirdWasInitialized) {
