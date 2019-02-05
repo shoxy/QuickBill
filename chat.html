@@ -2904,7 +2904,6 @@
         if (userMessage.length < 0) {
             return false;
         }
-        scrollChatToBottom();
         var data = {
             userId: userId,
             msg: userMessage,
@@ -2918,6 +2917,7 @@
             }
             channels[channelId].endTyping();
             parseMessage(message);
+            scrollChatToBottom();
         });
         $.post(apiPostMessageUrl, JSON.stringify(data));
         return true;
