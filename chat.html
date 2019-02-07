@@ -107,6 +107,7 @@
             overflow: scroll;
             flex-direction: column;
             background: rgb(247, 247, 247);
+            position: relative;
         }
 
         .side-column {
@@ -1683,6 +1684,9 @@
 </div>
 
 <div id="graphs-container" class="js-column">
+    <div class="js-graphs-loader-overlay" style="position: absolute;left: 0px;top: 42px;width: 100%;height: 100%;z-index: 9999;background: rgb(247, 247, 247); display: none;">
+        <img src="/img/loader-red.gif" alt="" style="    position: absolute; top: 45%; left: 50%; width: 200px; height: 200px; margin-top: -100px; margin-left: -100px;">
+    </div>
     <div style="z-index: 999;">
         <ul class="nav nav-tabs nav-justified" role="tablist">
             <li class="nav-item">
@@ -1730,7 +1734,6 @@
                 <div class="file-container hidden">
                     <div class="file-data">
                         <div class="file-preview">
-
                         </div>
                         <div class="file-description">
                             <div class="file-description__filename"></div>
@@ -1860,7 +1863,7 @@
         $('#user-id').text('GUEST');
     }
     $avatar.attr('data-src', userObject.profile_pic);
-    var channels = {{channels | safe}};
+    var channels = [];
     var $lastMessage = null;
     var $portfolioData = $('#portfolioData');
     var portfolioData = eval($portfolioData.text());
@@ -1942,7 +1945,7 @@
                 "<span class='channel-info__date'>1/1/2019</span></div>" +
                 "</div>");
             var $selectorBtn = selectorBtnContainer.find('.portfolio-selector');
-            var portfolioName = portfolioData[i].name;
+            var portfolioName = portfolioData[i].portfolio_name;
             var syncButton = selectorBtnContainer.find('.js-sync-button');
             $('.js-portfolio-image').attr('data-channelId', portfolioChannelId);
             $('.js-portfolio-image-input').attr('data-channelId', portfolioChannelId);
@@ -1956,11 +1959,10 @@
             }
             selectorBtnContainer.find('.chanel-info__message-body').first().text(lastMsgText);
             selectorBtnContainer.find('.channel-info__date').first().text(portfolioData[i].channelData.last_msg_created_at);
-
-            var btnText = "<span class='portfolio-selector__text'>" + portfolioData[i].name + "</span>";
+            var btnText = "<span class='portfolio-selector__text'>" + portfolioData[i].portfolio_name + "</span>";
             var messagesCount = portfolioData[i].channelData.unread_messages_count;
             if (portfolioChannelId !== channelId && messagesCount > 0) {
-                btnText = "<span class='portfolio-selector__text'>" + portfolioData[i].name + "</span>"
+                btnText = "<span class='portfolio-selector__text'>" + portfolioData[i].portfolio_name + "</span>"
                     + "<span class='badge badge-pill badge-primary'>" + messagesCount + "</span>";
             }
             $selectorBtn.html(btnText);
@@ -1980,56 +1982,60 @@
 
     var graphsCounter = 0;
     function initGraphs(portfolioData) {
+        for (var i in portfolioData) {
+            renderGraphsFromJson(portfolioData[i].graphs);
+        }
+        $(window).trigger('resize');
+    }
+
+    function renderGraphsFromJson(json) {
         var graphsContainer = $('#graphs-container').first();
         var width = graphsContainer.width();
         var height = (graphsContainer.height() / 2) - 30;
-        for (var i in portfolioData) {
-            var graphsData = JSON.parse(portfolioData[i].graphs);
-            for (var j in graphsData) {
-                var graphDiv = $('<div></div>');
-                graphDiv.attr('data-portfolioName', portfolioData[i].name);
-                var id = 'graph-' + graphsCounter;
-                graphsCounter++;
-                graphDiv.attr('id', id);
-                graphDiv.appendTo($('#graphs'));
-                var graphData = graphsData[j];
-                if (!graphData) {
-                    continue;
-                }
-                var layout = graphData.layout;
-                var type = "";
-                if (graphData.data[0] !== undefined) {
-                    type = '' + graphData.data[0].type;
-                }
-                var isPie = type == 'pie';
-                layout.width = width;
-                layout.height = height;
-                var title = graphData.layout.title;
-                graphData.layout.title = sanitizeName(graphData.layout.title);
-                if (isPie) {
-                    $('#' + id).detach().appendTo('#pies');
-                    graphData.data[0].domain.x[1] = 1;
-                }
-                // if (parseInt(j) === 4 || parseInt(j) === 5) {
-                //     $('#' + id).detach().appendTo('#graphs-1');
-                // }
-                if (parseInt(j) === 2 || parseInt(j) === 3) {
-                    $('#' + id).detach().appendTo('#graphs-2');
-                }
-                layout.align = 'center';
-                Plotly.plot(
-                    id, // the ID of the div, created above
-                    graphData.data,
-                    layout
-                );
-                graphIdPortfolioNameMapping['#' + id] = title;
-                var graph = $('#' + id);
-                if (parseInt(i) !== 0) {
-                    graph.hide();
-                }
+        var graphsData = JSON.parse(json);
+        for (var j in graphsData) {
+            var graphDiv = $('<div></div>');
+            // graphDiv.attr('data-portfolioName', portfolioData[i].portfolio_name);
+            var id = 'graph-' + graphsCounter;
+            graphsCounter++;
+            graphDiv.attr('id', id);
+            graphDiv.appendTo($('#graphs'));
+            var graphData = graphsData[j];
+            if (!graphData) {
+                continue;
             }
+            var layout = graphData.layout;
+            var type = "";
+            if (graphData.data[0] !== undefined) {
+                type = '' + graphData.data[0].type;
+            }
+            var isPie = type == 'pie';
+            layout.width = width;
+            layout.height = height;
+            var title = graphData.layout.title;
+            graphData.layout.title = sanitizeName(graphData.layout.title);
+            if (isPie) {
+                $('#' + id).detach().appendTo('#pies');
+                graphData.data[0].domain.x[1] = 1;
+            }
+            // if (parseInt(j) === 4 || parseInt(j) === 5) {
+            //     $('#' + id).detach().appendTo('#graphs-1');
+            // }
+            if (parseInt(j) === 2 || parseInt(j) === 3) {
+                $('#' + id).detach().appendTo('#graphs-2');
+            }
+            layout.align = 'center';
+            Plotly.plot(
+                id, // the ID of the div, created above
+                graphData.data,
+                layout
+            );
+            graphIdPortfolioNameMapping['#' + id] = title;
+            // var graph = $('#' + id);
+            // if (parseInt(i) !== 0) {
+            //     graph.hide();
+            // }
         }
-        $(window).trigger('resize');
     }
 
     function initDocs() {
@@ -2087,7 +2093,7 @@
     });
 
     if (!isConciergePage) {
-        initGraphs(portfolioData);
+        // initGraphs(portfolioData);
     }
     initDocs();
     initSendBird();
@@ -2095,6 +2101,7 @@
     $(document).on('click', '.portfolio-selector', function () {
         $(this).find('.badge').first().hide();
         channelId = $(this).attr('data-channelId');
+        getPortfolioData();
         window.channelId = channelId;
         iframe.contentWindow.location.reload();
         Cookies.set('channelId', channelId);
@@ -2172,20 +2179,17 @@
         var container = $('#graphs-container');
         var width = container.width();
         var height = (container.height() / 2) - 30;
-        var graphsCounter = 0;
-        for (var i in portfolioData) {
-            var graphsData = JSON.parse(portfolioData[i].graphs);
-            for (var j in graphsData) {
-                if (!$('#graph-' + graphsCounter).is(':hidden')) {
-                    Plotly.relayout('graph-' + graphsCounter, {
-                        width: width,
-                        height: height,
-                        align: 'center'
-                    });
-                }
-                graphsCounter++;
+
+        container.find('.js-plotly-plot').each(function (index, item) {
+            if (!$(item).is(':hidden')) {
+                Plotly.relayout($(item).attr('id'), {
+                    width: width,
+                    height: height,
+                    align: 'center'
+                });
             }
-        }
+        });
+
     });
 
     $("#search-input").on('input propertychange', function (event) {
@@ -2833,22 +2837,6 @@
         return messageObject.sender.userId == userId;
     }
 
-    function hashFnv32a(str, asString, seed) {
-        /*jshint bitwise:false */
-        var i, l,
-            hval = (seed === undefined) ? 0x811c9dc5 : seed;
-
-        for (i = 0, l = str.length; i < l; i++) {
-            hval ^= str.charCodeAt(i);
-            hval += (hval << 1) + (hval << 4) + (hval << 7) + (hval << 8) + (hval << 24);
-        }
-        if (asString) {
-            // Convert to 8 digit hex string
-            return ("0000000" + (hval >>> 0).toString(16)).substr(-8);
-        }
-        return hval >>> 0;
-    }
-
     $(document).on('keyup', '.js-message-input', function (event) {
         if (event.keyCode !== 13) {
             return;
@@ -3457,6 +3445,7 @@
         $('#loader-overlay').hide();
         $('#concierge-iframe').attr('src','/concierge-example');
         $('#invoice-generator').attr('src','/insert-trans');
+        getPortfolioData();
     };
 
     $('#invoice-modal').on('hidden.bs.modal', function (e) {
@@ -3497,7 +3486,7 @@
             error: function (error) {
                 console.error(error);
             },
-        });
+        });x
     });
 
     $(document).on('change', '.js-portfolio-image-input', function (event) {
@@ -3539,6 +3528,31 @@
             button.html('Load more');
         });
     });
+
+    var processedChannels = [];
+
+    function getPortfolioData() {
+        // if (processedChannels[channelId]) {
+        //     console.log(processedChannels[channelId], 'asd');
+        //     handlerChannelDataResponse(processedChannels[channelId]);
+        //     return;
+        // }
+        // console.log('should show loader');
+        $('.js-graphs-loader-overlay').show();
+        var url = '/getchannelgraph/' + channelId + '?uniqid=' + Math.random();
+        $.get(url, '', function (response) {
+            handlerChannelDataResponse(response);
+            $('.js-graphs-loader-overlay').hide();
+            processedChannels[channelId] = response;
+        });
+    }
+
+    function handlerChannelDataResponse(response) {
+        for (var i in response.documents) {
+            renderChannelFiles(response.documents[i]);
+        }
+        renderGraphsFromJson(response.graphs);
+    }
 </script>
 
 </body>
