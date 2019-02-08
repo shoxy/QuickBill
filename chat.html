@@ -1812,6 +1812,7 @@
 </div>
 
 <div id="portfolioData" style="display: none">{{portList | safe}}</div>
+<div id="conciergeChannels" style="display: none">{{channels | safe}}</div>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/d3/3.5.6/d3.min.js"></script>
 <!-- jQuery -->
@@ -1891,7 +1892,11 @@
     var interval = null;
     var modal = $('#myModal');
 
-    var channelId = isConciergePage ? channels.channel_url : portfolioData[0].channelId;
+    if (isConciergePage) {
+        portfolioData = eval($('#conciergeChannels').text());
+    }
+
+    var channelId = portfolioData[0].channelId;
     var channelIdFromQuery = new URLSearchParams(window.location.search).get('channelId');
     var cookieValue = Cookies.get('channelId');
     if (cookieValue !== undefined && !isConciergePage) {
@@ -3543,6 +3548,8 @@
         $.get(url, '', function (response) {
             handlerChannelDataResponse(response);
             $('.js-graphs-loader-overlay').hide();
+            var observer = lozad();
+            observer.observe();
             processedChannels[channelId] = response;
         });
     }
