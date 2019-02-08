@@ -3555,6 +3555,7 @@
     }
 
     function handlerChannelDataResponse(response) {
+        $('.file-container').not('.hidden').hide();
         for (var i in response.documents) {
             renderChannelFiles(response.documents[i]);
         }
