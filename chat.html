@@ -2663,7 +2663,8 @@
             for (var i in replies) {
                 var $buttonSample = $messageContainer.find('.option-button').first();
                 var $button = $buttonSample.clone();
-                $button.text(replies[i].reply);
+                var text = replies[i].reply.replace('\u0092', "'");
+                $button.html(text);
                 $button.attr('data-questionId', questionId);
                 $button.attr('data-userId', userId);
                 $button.show();
@@ -2843,7 +2844,8 @@
     }
 
     $(document).on('keyup', '.js-message-input', function (event) {
-        if (event.keyCode !== 13) {
+        var text = $(this).val();
+        if (event.keyCode !== 13 || text.length === 0) {
             return;
         }
         var data = {
@@ -2893,13 +2895,16 @@
             return;
         }
         var userMessage = $(this).val();
+        if (userMessage.length === 0) {
+
+        }
         if (handleUserMessage(userMessage)) {
             $(this).css('height', '40px');
         }
     });
 
     function handleUserMessage(userMessage) {
-        if (userMessage.length < 0) {
+        if (userMessage.length <= 0) {
             return false;
         }
         var data = {
