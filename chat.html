@@ -2020,7 +2020,7 @@
             var title = graphData.layout.title;
             graphData.layout.title = sanitizeName(graphData.layout.title);
             if (isPie) {
-                $('#' + id).detach().appendTo('#pies');
+                // $('#' + id).detach().appendTo('#pies');
                 graphData.data[0].domain.x[1] = 1;
             }
             // if (parseInt(j) === 4 || parseInt(j) === 5) {
@@ -3525,10 +3525,10 @@
         $.get('/get-additional-channels/' + userId, '', function (response) {
             renderPortfolios(response.portList);
             initSendBird();
-            initGraphs(response.portList);
-            for (var i in response.documents) {
-                renderChannelFiles(response.documents[i]);
-            }
+            // initGraphs(response.portList);
+            // for (var i in response.documents) {
+            //     renderChannelFiles(response.documents[i]);
+            // }
             button.removeClass('disabled');
             button.html('Load more');
         });
