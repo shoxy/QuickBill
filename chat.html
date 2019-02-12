@@ -2483,12 +2483,13 @@
                 renderCards(cards, messageObject);
                 break;
             case '':
-                if (optionMessageWithoutText) {
-                    var res = getReplies(optionMessageWithoutText);
-                    renderMessage(optionMessageWithoutText, messageObject.message, res[0], res[1]);
-                    optionMessageWithoutText = null;
-                    break;
-                }
+                // if (optionMessageWithoutText) {
+                //     console.log(optionMessageWithoutText);
+                //     var res = getReplies(optionMessageWithoutText);
+                //     renderMessage(optionMessageWithoutText, messageObject.message, res[0], res[1]);
+                //     optionMessageWithoutText = null;
+                //     break;
+                // }
                 if (messageObject.messageType == 'file') {
                     if (shouldAddFile) {
                         try {
