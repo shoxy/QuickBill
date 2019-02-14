@@ -2101,7 +2101,7 @@
         // initGraphs(portfolioData);
     }
     initDocs();
-    initSendBird();
+    initSendBird(true);
 
     $(document).on('click', '.portfolio-selector', function () {
         $(this).find('.badge').first().hide();
@@ -2231,7 +2231,7 @@
     var channelsCount = 0;
     var messagesLimit = 40;
 
-    function initSendBird() {
+    function initSendBird(shouldAddChannelHandlers) {
         var appId = isConciergePage ? '9A997118-6C53-4FA2-AEAA-C335293220B2' : '9A997118-6C53-4FA2-AEAA-C335293220B2';
         var sb = new SendBird({ appId: appId });
         if (isConciergePage) {
@@ -2251,87 +2251,90 @@
         }
 
         sendbird = sb;
-        var ChannelHandler = new sb.ChannelHandler();
+        if (shouldAddChannelHandlers) {
+            var ChannelHandler = new sb.ChannelHandler();
 
-        ChannelHandler.onMessageReceived = function (channel, message) {
-            var $typingIndicatorSelector = $('.js-loading');
-            $typingIndicatorSelector.each(function (index, item) {
-                if ($(item).attr('data-userId') == message.sender.userId) {
-                    $(item).hide();
-                }
-            });
-            var channelButton = $('button[data-channelid="' + channel.url +'"]');
-            var unreadMessageCount = parseInt(channel.unreadMessageCount);
-            var senderNickname = channel.lastMessage.sender ? channel.lastMessage.sender.nickname : 'admin';
-            if (unreadMessageCount > 1 && channel.url != channelId) {
-                var buttonBadge = channelButton.find('.badge-pill');
-                if (!buttonBadge.length) {
-                    var btnText = "<span class='badge badge-pill badge-primary'>" + unreadMessageCount + "</span>";
-                    channelButton.append(btnText);
-                } else {
-                    buttonBadge.text(channel.unreadMessageCount);
-                }
-                buttonBadge.show();
-                var lastMessageText = channel.lastMessage.message;
-                if (lastMessageText.charAt(0) === '{') {
-                    lastMessageText = 'message';
-                }
-                if (lastMessageText.length > 20) {
-                    lastMessageText = lastMessageText.substring(0, 20) + '...';
-                }
-                channelButton.siblings().find('.channel-info__author').text(senderNickname);
-                channelButton.siblings().find('.chanel-info__message-body').text(lastMessageText);
-                channelButton.siblings().find('.channel-info__date').text(new Date(channel.lastMessage.createdAt).toGMTString());
-            }
-            if (message.data.length > 0 && JSON.parse(message.data.replace(/'/g, '"')).isOptionsMessage == true) {
-                messageForOptions = message;
-                return;
-            }
-            shouldUseInverseMode = false;
-            parseMessage(message, messageForOptions, null, true);
-            messageForOptions = null;
-            scrollChatToBottom();
-            newTitle = 'New message from ' + senderNickname;
-            if (!document.hasFocus() && !interval) {
-                interval = setInterval(changeTitle, 700);
-            }
-            var audio = new Audio('/static/audio/ring.mp3');
-            audio.play();
-        };
-
-        ChannelHandler.onTypingStatusUpdated = function (groupChannel) {
-            var typingMembers = groupChannel.getTypingMembers();
-            if (typingMembers.length === 0) {
-                $('.js-loading').each(function (index, item) {
-                    $(item).hide();
-                });
-                return;
-            }
-            shouldUseInverseMode = false;
-            for (var i in typingMembers) {
-                var shouldDisplay = true;
+            ChannelHandler.onMessageReceived = function (channel, message) {
                 var $typingIndicatorSelector = $('.js-loading');
                 $typingIndicatorSelector.each(function (index, item) {
-                    if ($(item).attr('data-userId') == typingMembers[i].userId && !$(item).is(':hidden')) {
-                        shouldDisplay = false;
+                    if ($(item).attr('data-userId') == message.sender.userId) {
+                        $(item).hide();
                     }
                 });
+                var channelButton = $('button[data-channelid="' + channel.url +'"]');
+                var unreadMessageCount = parseInt(channel.unreadMessageCount);
+                var senderNickname = channel.lastMessage.sender ? channel.lastMessage.sender.nickname : 'admin';
+                if (unreadMessageCount > 1 && channel.url != channelId) {
+                    var buttonBadge = channelButton.find('.badge-pill');
+                    if (!buttonBadge.length) {
+                        var btnText = "<span class='badge badge-pill badge-primary'>" + unreadMessageCount + "</span>";
+                        channelButton.append(btnText);
+                    } else {
+                        buttonBadge.text(channel.unreadMessageCount);
+                    }
+                    buttonBadge.show();
+                    var lastMessageText = channel.lastMessage.message;
+                    if (lastMessageText.charAt(0) === '{') {
+                        lastMessageText = 'message';
+                    }
+                    if (lastMessageText.length > 20) {
+                        lastMessageText = lastMessageText.substring(0, 20) + '...';
+                    }
+                    channelButton.siblings().find('.channel-info__author').text(senderNickname);
+                    channelButton.siblings().find('.chanel-info__message-body').text(lastMessageText);
+                    channelButton.siblings().find('.channel-info__date').text(new Date(channel.lastMessage.createdAt).toGMTString());
+                }
+                if (message.data.length > 0 && JSON.parse(message.data.replace(/'/g, '"')).isOptionsMessage == true) {
+                    messageForOptions = message;
+                    return;
+                }
+                shouldUseInverseMode = false;
+                parseMessage(message, messageForOptions, null, true);
+                messageForOptions = null;
+                scrollChatToBottom();
+                newTitle = 'New message from ' + senderNickname;
+                if (!document.hasFocus() && !interval) {
+                    interval = setInterval(changeTitle, 700);
+                }
+                var audio = new Audio('/static/audio/ring.mp3');
+                audio.play();
+            };
 
-                if (shouldDisplay) {
-                    var $message = $typingIndicatorSelector.last().clone();
-                    $message.find('.user-avatar').first().attr('src', typingMembers[i].profileUrl);
-                    $message.attr('data-userId', typingMembers[i].userId);
-                    addMessageToChatColumn($message, groupChannel.url);
-                    if (groupChannel.url == channelId && shouldDisplay) {
-                        scrollChatToBottom();
+            ChannelHandler.onTypingStatusUpdated = function (groupChannel) {
+                var typingMembers = groupChannel.getTypingMembers();
+                if (typingMembers.length === 0) {
+                    $('.js-loading').each(function (index, item) {
+                        $(item).hide();
+                    });
+                    return;
+                }
+                shouldUseInverseMode = false;
+                for (var i in typingMembers) {
+                    var shouldDisplay = true;
+                    var $typingIndicatorSelector = $('.js-loading');
+                    $typingIndicatorSelector.each(function (index, item) {
+                        if ($(item).attr('data-userId') == typingMembers[i].userId && !$(item).is(':hidden')) {
+                            shouldDisplay = false;
+                        }
+                    });
+
+                    if (shouldDisplay) {
+                        var $message = $typingIndicatorSelector.last().clone();
+                        $message.find('.user-avatar').first().attr('src', typingMembers[i].profileUrl);
+                        $message.attr('data-userId', typingMembers[i].userId);
+                        addMessageToChatColumn($message, groupChannel.url);
+                        if (groupChannel.url == channelId && shouldDisplay) {
+                            scrollChatToBottom();
+                        }
                     }
                 }
-            }
-        };
-        ChannelHandler.onUserJoined = function(groupChannel, user) {
-            window.location.reload(true);
-        };
-        sb.addChannelHandler(uuidv4(), ChannelHandler);
+            };
+            ChannelHandler.onUserJoined = function(groupChannel, user) {
+                window.location.reload(true);
+            };
+            sb.addChannelHandler(uuidv4(), ChannelHandler);
+        }
+
         var channelListQuery = sb.GroupChannel.createMyGroupChannelListQuery();
         channelListQuery.includeEmpty = true;
         channelListQuery.limit = 20; // pagination limit could be set up to 100
@@ -3529,12 +3532,10 @@
         button.addClass('disabled');
         button.html('<i class="fa fa-spinner fa-spin"></i>');
         $.get('/get-additional-channels/' + userId, '', function (response) {
-            renderPortfolios(response.portList);
-            initSendBird();
-            // initGraphs(response.portList);
-            // for (var i in response.documents) {
-            //     renderChannelFiles(response.documents[i]);
-            // }
+            if (response.error) {
+                renderPortfolios(response.portList);
+                initSendBird(false);
+            }
             button.removeClass('disabled');
             button.html('Load more');
         });
@@ -3543,12 +3544,6 @@
     var processedChannels = [];
 
     function getPortfolioData() {
-        // if (processedChannels[channelId]) {
-        //     console.log(processedChannels[channelId], 'asd');
-        //     handlerChannelDataResponse(processedChannels[channelId]);
-        //     return;
-        // }
-        // console.log('should show loader');
         $('.js-graphs-loader-overlay').show();
         var url = '/getchannelgraph/' + channelId + '?uniqid=' + Math.random();
         $.get(url, '', function (response) {
