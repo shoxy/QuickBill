@@ -40,10 +40,12 @@ body {
 
 .side-column {
     display: flex;
-    flex: 1.5 1 100px;
+    /*flex: 1.5 1 100px;*/
+    width: 15%;
     position: relative;
     overflow: scroll;
     flex-direction: column;
+    padding-top: 33vh;
 }
 
 .chat-column {
@@ -1336,4 +1338,14 @@ html {
 
 .image-message {
     height: 300px;
+}
+
+#sidebar-avatar {
+    z-index: 1000;
+    position: fixed;
+    background: #f5f5f5;
+    display: flex;
+    flex-direction: column;
+    margin-top: -33vh;
+    width: 15%;
 }

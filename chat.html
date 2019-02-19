@@ -5,9 +5,9 @@
     <link id="favicon" rel="icon" type="image/png" href="favicon-48x48.png">
     <!--<link rel="icon" type="image/png" sizes="16x16" href="favicon-16x16.png">-->
     <!--<link-->
-        <!--rel="stylesheet"-->
-        <!--href="/static/css/chat.css"-->
-        <!--crossorigin="anonymous"-->
+    <!--rel="stylesheet"-->
+    <!--href="/static/css/chat.css"-->
+    <!--crossorigin="anonymous"-->
     <!--&gt;-->
 
     <link rel="stylesheet" href="/static/css/chat.css" media="none" onload="if(media!='all')media='all'"><noscript><link rel="stylesheet" href="/static/css/chat.css"></noscript>
@@ -269,8 +269,22 @@
 <div class="doc-content">{{doc}}</div>
 {% endfor %}
 
-<div class="side-column js-column">
+<div class="side-column js-column" style="background-color: rgba(51, 51, 51, 0.05)">
     <div id="sidebar-avatar">
+        <div class="input-group md-form form-sm">
+            <div class="input-group-prepend">
+                <span class="input-group-text purple lighten-3">
+                    <i class="fa fa-search text-white" aria-hidden="true"></i>
+                </span>
+            </div>
+            <input class="form-control my-0 py-1"
+                type="text"
+                placeholder="Search"
+                aria-label="Search"
+                id="channels-search-input"
+            >
+        </div>
+
         <img class="lozad"
             data-src="{{profile_pic}}"
             id="avatar"
@@ -345,7 +359,7 @@
 </div>
 
 <div id="graphs-container" class="js-column">
-    <div class="js-graphs-loader-overlay" style="position: absolute;left: 0px;top: 42px;width: 100%;height: 100%;z-index: 9999;background: rgb(247, 247, 247); display: none;">
+    <div class="js-graphs-loader-overlay" style="position: absolute;left: 0px;top: 42px;width: 100%;height: 100%;z-index: 999;background: rgb(247, 247, 247); display: none;">
         <img src="/img/loader-red.gif" alt="" style="    position: absolute; top: 45%; left: 50%; width: 200px; height: 200px; margin-top: -100px; margin-left: -100px;">
     </div>
     <div style="z-index: 999;">
@@ -361,14 +375,14 @@
                 </a>
             </li>
             <!--<li class="nav-item" style="display: none">-->
-                <!--<a role="tab" data-toggle="tab" class="nav-link" href="#pies">-->
-                    <!--<img src="/static/img/pie-chart.png" alt="" class="lozad">-->
-                <!--</a>-->
+            <!--<a role="tab" data-toggle="tab" class="nav-link" href="#pies">-->
+            <!--<img src="/static/img/pie-chart.png" alt="" class="lozad">-->
+            <!--</a>-->
             <!--</li>-->
             <!--<li class="nav-item" style="display: none">-->
-                <!--<a role="tab" data-toggle="tab" class="nav-link" href="#graphs-1">-->
-                    <!--<img src="/static/img/1-a.png" alt="" class="lozad">-->
-                <!--</a>-->
+            <!--<a role="tab" data-toggle="tab" class="nav-link" href="#graphs-1">-->
+            <!--<img src="/static/img/1-a.png" alt="" class="lozad">-->
+            <!--</a>-->
             <!--</li>-->
             <li class="nav-item">
                 <a role="tab" data-toggle="tab" class="nav-link" href="#graphs-2">
@@ -406,9 +420,7 @@
                         <i class="fas fa-times"></i>
                     </div>
                 </div>
-                <div class="file-container--empty hidden" id="file-container--empty">
-                    There are no files
-                </div>
+                <!--<div class="file-container--empty hidden" id="file-container--empty"></div>-->
             </div>
         </div>
         <div role="tabpanel" class="about__row tab-pane" id="graphs">
@@ -572,7 +584,7 @@
     var hiddenContainers = [];
 
     if (!isConciergePage) {
-        renderPortfolios(portfolioData);
+        renderPortfolios(portfolioData, true);
     } else {
         renderConciergeMessagesContainer();
     }
@@ -585,20 +597,28 @@
         $messagesContainer.on('scroll', scrollHandler);
     }
 
-    function renderPortfolios(portfolioData) {
+    function renderPortfolios(portfolioData, shouldFillHiddenContainers) {
         for (var i in portfolioData) {
             var portfolioChannelId = portfolioData[i].channelId;
+            if (portfolioChannelId === undefined) {
+                portfolioChannelId = portfolioData[i].channel_url;
+            }
             var $messagesContainer = $('<div></div>');
             $messagesContainer.attr('class', 'messages');
             $messagesContainer.attr('id', portfolioChannelId);
             if (portfolioChannelId !== channelId) {
-                hiddenContainers[portfolioChannelId] = $messagesContainer;
+                if (shouldFillHiddenContainers) {
+                    hiddenContainers[portfolioChannelId] = $messagesContainer;
+                }
             } else {
                 $messagesContainer.on('scroll', scrollHandler);
                 $messagesContainer.prependTo(jsChatColumn);
             }
 
             var thumbSrc = portfolioData[i].thumb;
+            if (thumbSrc === undefined) {
+                thumbSrc = portfolioData[i].channel.cover_url;
+            }
             var selectorBtnContainer = $("<div class='portfolio-selector__container'>" +
                 "<img class='portfolio-selector__thumb js-portfolio-image' src='" + thumbSrc + "' alt='thumb'>" +
                 "<input type='file' class='js-portfolio-image-input hidden'>"+
@@ -610,24 +630,32 @@
                 "</div>");
             var $selectorBtn = selectorBtnContainer.find('.portfolio-selector');
             var portfolioName = portfolioData[i].portfolio_name;
+            if (portfolioName === undefined) {
+                portfolioName = portfolioData[i].name;
+            }
             var syncButton = selectorBtnContainer.find('.js-sync-button');
             $('.js-portfolio-image').attr('data-channelId', portfolioChannelId);
             $('.js-portfolio-image-input').attr('data-channelId', portfolioChannelId);
-            selectorBtnContainer.find('.channel-info__author').first().text(portfolioData[i].channelData.last_msg_user);
-            var lastMsgText = portfolioData[i].channelData.last_msg;
-            if (lastMsgText.charAt(0) === '{') {
-                lastMsgText = 'message';
+            if (portfolioData[i].channelData && portfolioData[i].channelData.last_msg_user) {
+                selectorBtnContainer.find('.channel-info__author').first().text(portfolioData[i].channelData.last_msg_user);
+                var lastMsgText = portfolioData[i].channelData.last_msg;
+                if (lastMsgText.charAt(0) === '{') {
+                    lastMsgText = 'message';
+                }
+                if (lastMsgText.length > 20) {
+                    lastMsgText = lastMsgText.substring(0, 20) + '...';
+                }
+                selectorBtnContainer.find('.chanel-info__message-body').first().text(lastMsgText);
+                selectorBtnContainer.find('.channel-info__date').first().text(portfolioData[i].channelData.last_msg_created_at);
             }
-            if (lastMsgText.length > 20) {
-                lastMsgText = lastMsgText.substring(0, 20) + '...';
+            var btnText = "<span class='portfolio-selector__text'>" + portfolioName + "</span>";
+            var messagesCount = 0;
+            if (portfolioData[i].channelData && portfolioData[i].channelData.unread_messages_count) {
+                messagesCount = portfolioData[i].channelData.unread_messages_count;
             }
-            selectorBtnContainer.find('.chanel-info__message-body').first().text(lastMsgText);
-            selectorBtnContainer.find('.channel-info__date').first().text(portfolioData[i].channelData.last_msg_created_at);
-            var btnText = "<span class='portfolio-selector__text'>" + portfolioData[i].portfolio_name + "</span>";
-            var messagesCount = portfolioData[i].channelData.unread_messages_count;
             if (portfolioChannelId !== channelId && messagesCount > 0) {
-                btnText = "<span class='portfolio-selector__text'>" + portfolioData[i].portfolio_name + "</span>"
-                    + "<span class='badge badge-pill badge-primary'>" + messagesCount + "</span>";
+                btnText = "<span class='portfolio-selector__text'>" + portfolioName + "</span>"
+                    + "<span class='badge badge-pill badge-primary' style='position: initial; margin-left: 10px;'>" + messagesCount + "</span>";
             }
             $selectorBtn.html(btnText);
             $selectorBtn.attr('data-channelId', portfolioChannelId);
@@ -742,7 +770,7 @@
     });
 
     initDocs();
-    initSendBird(true);
+    initSendBird(true, portfolioData);
 
     $(document).on('click', '.portfolio-selector', function () {
         $(this).find('.badge').first().hide();
@@ -872,7 +900,7 @@
     var channelsCount = 0;
     var messagesLimit = 40;
 
-    function initSendBird(shouldAddChannelHandlers) {
+    function initSendBird(shouldAddChannelHandlers, channelsList) {
         var appId = isConciergePage ? '9A997118-6C53-4FA2-AEAA-C335293220B2' : '9A997118-6C53-4FA2-AEAA-C335293220B2';
         var sb = new SendBird({ appId: appId });
         if (isConciergePage) {
@@ -986,8 +1014,23 @@
                     console.error(error);
                 }
                 channelsCount = channelList.length;
+                console.log(channelsList);
                 for (var i in channelList) {
                     var groupChannel = channelList[i];
+                    var isChannelPresent = false;
+                    for (var j in channelsList) {
+                        var id = channelsList[j].channelId;
+                        if (channelsList[j].channel) {
+                            id = channelsList[j].channel.channel_url;
+                        }
+                        if (id == groupChannel.url) {
+                            isChannelPresent = true;
+                            break;
+                        }
+                    }
+                    if (!isChannelPresent) {
+                        continue;
+                    }
                     channels[groupChannel.url] = groupChannel;
                     var prevMessageListQuery = groupChannel.createPreviousMessageListQuery();
                     prevMessageListQuery.limit = messagesLimit;
@@ -1316,7 +1359,7 @@
         if (isAdminMessage(messageObject)) {
             $messageContainer.addClass('admin-message');
             $messageTextField.parent().addClass('text--admin-message');
-            $messageTextField.prepend('<i class="fab fa-android admin-message__android-icon"></i>');
+            // $messageTextField.prepend('<i class="fab fa-android admin-message__android-icon"></i>');
         }
         addMessageToChatColumn($messageContainer, messageObject.channelUrl);
     }
@@ -1945,9 +1988,9 @@
             nameContainer.appendTo(userDiv);
             userDiv.appendTo(modalBody);
         }
-        $('<input type="text" class="form-control" id="new-user-id">').appendTo(modalBody);
-        var $leaveButton = $('<button id="user-leave" class="btn btn-default user-operation" data-toggle="tooltip" data-placement="top" title="Leave"><img src="/static/img/leave.png"></button>');
-        var $inviteButton = $('<button id="user-invite" class="btn btn-default user-operation" data-toggle="tooltip" data-placement="top" title="Invite"><img src="/static/img/invite.png"></button>');
+        $('<input type="text" class="form-control" placeholder="Email" id="new-user-id">').appendTo(modalBody);
+        var $leaveButton = $('<button id="user-leave" class="btn btn-default user-operation" data-toggle="tooltip" data-placement="top" title="Escludi" style="padding: 0rem 0rem;"><img src="/static/img/leave.png"></button>');
+        var $inviteButton = $('<button id="user-invite" class="btn btn-default user-operation" data-toggle="tooltip" data-placement="top" title="Invita" style="padding: 0rem 0rem;"><img src="/static/img/invite.png"></button>');
         var $userOperationsContainer = $('<div class="user-operation__container"></div>');
         $inviteButton.tooltip();
         $leaveButton.tooltip();
@@ -2144,9 +2187,9 @@
         button.addClass('disabled');
         button.html('<i class="fa fa-spinner fa-spin"></i>');
         $.get('/get-additional-channels/' + userId, '', function (response) {
-            if (response.error) {
-                renderPortfolios(response.portList);
-                initSendBird(false);
+            if (!response.error) {
+                renderPortfolios(response.portList, true);
+                initSendBird(false, response.portList);
             }
             button.removeClass('disabled');
             button.html('Load more');
@@ -2174,6 +2217,16 @@
         }
         renderGraphsFromJson(response.graphs);
     }
+
+    $('#channels-search-input').on('keydown', function (event) {
+        if (event.keyCode === 13) {
+            $.get('search-channel/' + userId + '/' + $(this).val(), '', function (response) {
+                $('.portfolio-selector__container').hide();
+                renderPortfolios(response.channels, false);
+                initSendBird(false, response.channels);
+            });
+        }
+    })
 
 </script>
 
