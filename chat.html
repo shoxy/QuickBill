@@ -272,16 +272,12 @@
 <div class="side-column js-column" style="background-color: rgba(51, 51, 51, 0.05)">
     <div id="sidebar-avatar">
         <div class="input-group md-form form-sm">
-            <div class="input-group-prepend">
-                <span class="input-group-text purple lighten-3">
-                    <i class="fa fa-search text-white" aria-hidden="true"></i>
-                </span>
-            </div>
             <input class="form-control my-0 py-1"
                 type="text"
                 placeholder="Search"
                 aria-label="Search"
                 id="channels-search-input"
+                style="margin: 10px; top: 5px;"
             >
         </div>
 
@@ -1014,7 +1010,6 @@
                     console.error(error);
                 }
                 channelsCount = channelList.length;
-                console.log(channelsList);
                 for (var i in channelList) {
                     var groupChannel = channelList[i];
                     var isChannelPresent = false;
@@ -2220,10 +2215,12 @@
 
     $('#channels-search-input').on('keydown', function (event) {
         if (event.keyCode === 13) {
+            $('.side-column').addClass('disabled');
             $.get('search-channel/' + userId + '/' + $(this).val(), '', function (response) {
                 $('.portfolio-selector__container').hide();
-                renderPortfolios(response.channels, false);
+                renderPortfolios(response.channels, true);
                 initSendBird(false, response.channels);
+                $('.side-column').removeClass('disabled');
             });
         }
     })

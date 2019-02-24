@@ -1349,3 +1349,12 @@ html {
     margin-top: -33vh;
     width: 15%;
 }
+
+
+.disabled {
+    opacity: 0.2;
+}
+.disabled > * {
+    pointer-events: none;
+    cursor: not-allowed;
+}
