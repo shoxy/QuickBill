@@ -1,8 +1,8 @@
 <!doctype html>
 <html>
 <head>
-    <title>OMNE.AI</title>
-    <link id="favicon" rel="icon" type="image/png" href="favicon-48x48.png">
+    <title>fisco24.app</title>
+    <link id="favicon" rel="icon" type="image/png" href="/img/favicon-48x48.png">
     <!--<link rel="icon" type="image/png" sizes="16x16" href="favicon-16x16.png">-->
     <!--<link-->
     <!--rel="stylesheet"-->
@@ -33,11 +33,11 @@
     <script type="application/ld+json">{
     "@context": "http://schema.org",
     "@type": "SoftwareApplication",
-    "name": "OMNE: Effortless Investing",
+    "name": "fisco24: Effortless Investing",
     "publisher":
     {
     "@type": "Organization",
-    "name": "OMNE"
+    "name": "fisco24"
     },
     "applicationCategory": "Business",
     "applicationSubCategory": "Business Software",
@@ -50,15 +50,15 @@
     <script type="application/ld+json">{
     "@context": "http://schema.org",
     "@type": "LocalBusiness",
-    "name": "OMNE",
+    "name": "fisco24",
     "description": "Let your Bot invest while you enjoy lower fees.",
-    "legalName": "OMNE",
-    "image": "https://omne.ai/img/logo_black.svg",
+    "legalName": "fisco24",
+    "image": "https://fisco24.app/img/logo_black.svg",
     "founder": "Giovanni Piccinelli",
     "telephone": "+39 392 8750821",
-    "email": "hi@omne.ai",
-    "url": "https://www.omne.ai",
-    "sameAs": ["http://www.facebook.com/omne", "http://www.linkedin.com/company/omne"],
+    "email": "hi@fisco24.app",
+    "url": "https://www.fisco24.app",
+    "sameAs": ["http://www.facebook.com/fisco24", "http://www.linkedin.com/company/fisco24"],
     "openingHours": "Mo-Su, All day",
     "address":
     {
@@ -95,13 +95,13 @@
                     d="M43.739 30.953c4.486 0 4.486-6.729 0-6.729s-4.486 6.73 0 6.73zM62.58 28.261c4.485 0 4.485-6.729 0-6.729-4.487 0-4.487 6.73 0 6.73zM80.075 25.57c4.486 0 4.486-6.73 0-6.73s-4.486 6.73 0 6.73z"></path></svg>
             </span>
             <h1>
-                <span style="color: rgb(41, 120, 253);">OMNE</span> was designed to be beautiful on a big screen. Try
+                <span style="color: rgb(41, 120, 253);">fisco24</span> was designed to be beautiful on a big screen. Try
                 it on a desktop
             </h1>
         </div>
         <div class="app-links">
             <div class="app-links__description">
-                Or be mobile and download <span style="color: rgb(41, 120, 253);">OMNE app</span>
+                Or be mobile and download <span style="color: rgb(41, 120, 253);">fisco24 app</span>
             </div>
             <a href="" target="_blank">
                 <span>
@@ -219,7 +219,7 @@
     </div>
 
     <div class="responder-message-container js-loading">
-        <img src="https://www.omne.ai/img/favicon-32x32.png" alt="" class="user-avatar">
+        <img src="https://www.fisco24.app/img/favicon-32x32.png" alt="" class="user-avatar">
         <div class="sender js-sent-at"></div>
         <div style=" display: flex; flex-direction: column;">
             <div class="loading-items__container">
@@ -288,7 +288,7 @@
         <img class="lozad"
             data-src="{{profile_pic}}"
             id="avatar"
-            alt="OMNE"
+            alt="fisco24"
             style="height: 100px; width: 100px; display: flex"/>
         <input type="file" class="hidden" id="avatar-file-input">
 
@@ -560,7 +560,7 @@
     var oldTitle = $(document).find("title").text();
     var oldFavicon = $('#favicon').attr('href');
     var newTitle = 'New message received';
-    var newFavicon = 'notification.png';
+    var newFavicon = '/img/notification.png';
     var jsChatColumn = $('#js-chat-column');
     var interval = null;
     var modal = $('#myModal');
@@ -1648,7 +1648,7 @@
         if (!messageObject.sender) {
             return '';
         }
-        return messageObject.sender.profileUrl.replace('http://omne', 'https://www.omne').replace('http://botvest', 'https://www.botvest');
+        return messageObject.sender.profileUrl.replace('http://fisco24', 'https://www.fisco24').replace('http://botvest', 'https://www.botvest');
     }
 
     function getNickname(messageObject) {
@@ -1885,7 +1885,7 @@
     var handler = StripeCheckout.configure({
         key: 'pk_live_ms0wO9HQtHsHG2gWJq0wahLz', // FIXME get from some other place??
         // key: 'pk_test_pavnBBACknzbepGLWntkBJXy', // FIXME get from some other place??
-        image: 'https://www.omne.ai/img/favicon-32x32.png',
+        image: 'https://www.fisco24.app/img/favicon-32x32.png',
         locale: 'auto',
         currency: 'eur',
         token: function (token) {
@@ -1904,7 +1904,7 @@
     $(document).on('click', '.payment-button', function (event) {
         event.preventDefault();
         handler.open({
-            name: 'La Villa del Lago',
+            name: 'fisco24',
             description: $(this).attr('data-description'),
             zipCode: true,
             currency: 'eur',
@@ -1970,7 +1970,7 @@
         modalBody.empty();
         for (var i in channelUsers[channelId]) {
             var userDiv = $('<div></div>').addClass('channel-user');
-            var avatar = $('<img/>').addClass('channel-user__avatar').attr('src', channelUsers[channelId][i].profile_url.replace('http://omne', 'https://www.omne').replace('http://botvest', 'https://www.botvest'));
+            var avatar = $('<img/>').addClass('channel-user__avatar').attr('src', channelUsers[channelId][i].profile_url.replace('http://fisco24', 'https://www.fisco24').replace('http://botvest', 'https://www.botvest'));
             var name = $('<span></span>').addClass('channel-user__name').text(channelUsers[channelId][i].nickname);
             var status = $('<span></span>').addClass('channel-user__status');
             var nameContainer = $('<div class="user-name__container"></div>');
