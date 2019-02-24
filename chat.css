@@ -1358,3 +1358,21 @@ html {
     pointer-events: none;
     cursor: not-allowed;
 }
+
+@media screen and (max-height: 720px) {
+    .portfolio-selector__container:first-of-type {
+        margin-top: 5vh;
+    }
+    .portfolio-selector__container:first-child {
+        margin-top: 5vh;
+    }
+}
+
+@media screen and (max-height: 640px) {
+    .portfolio-selector__container:first-of-type {
+        margin-top: 8vh;
+    }
+    .portfolio-selector__container:first-child {
+        margin-top: 8vh;
+    }
+}
